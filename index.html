@@ -3,47 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CapyOS v16 - Dynamic API</title>
+    <title>CapyOS v17 - API Input Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="importmap">
       { "imports": { "@google/generative-ai": "https://esm.run/@google/generative-ai" } }
     </script>
     <style>
         body { background: #000; color: white; font-family: sans-serif; overflow: hidden; height: 100vh; margin: 0; }
-        .glass { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); }
-        .app-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); z-index: 100; }
-        .app-active { transform: translateY(0%); }
-        #api-setup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .glass { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        #api-gateway { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        #os-interface { display: none; }
+        .capy-glow { box-shadow: 0 0 50px #ff9500; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
-    <div id="api-setup" class="flex flex-col text-center">
-        <h2 class="text-2xl font-black text-orange-500 mb-6">CAPYMAN ZEKASI İÇİN API LAZIM KANKA</h2>
-        <input id="api-input" type="password" placeholder="AIza... anahtarını buraya yapıştır" class="w-full bg-zinc-900 border border-zinc-700 p-4 rounded-2xl mb-4 text-white outline-none">
-        <button onclick="saveApiKey()" class="w-full bg-orange-600 p-4 rounded-2xl font-bold active:scale-95 transition-transform">SİSTEME KAYDET</button>
-        <p class="text-[10px] mt-4 opacity-40">Not: Anahtar sadece bu telefonda saklanır, GitHub'a gitmez.</p>
+    <div id="api-gateway">
+        <div class="text-7xl mb-8 animate-bounce">🗿</div>
+        <h2 class="text-xl font-black text-orange-500 mb-6 tracking-widest">API ANAHTARINI DÖKÜL KANKA</h2>
+        <input id="api-key-input" type="text" placeholder="AIzaSy... anahtarını buraya çak" class="w-full bg-zinc-900 border-2 border-orange-600 p-4 rounded-3xl text-white mb-6 outline-none text-center font-mono text-xs">
+        <button onclick="bootSystem()" class="w-full bg-orange-600 p-4 rounded-3xl font-black text-xl active:scale-90 transition-all shadow-lg shadow-orange-900/50">SİSTEMİ ATEŞLE</button>
+        <p class="mt-6 text-[10px] opacity-30 italic">Kanka bu anahtar sadece senin J7'de saklanır, GitHub göremez.</p>
     </div>
 
-    <div class="p-6 h-full flex flex-col items-center">
+    <div id="os-interface" class="p-6 h-full flex flex-col items-center">
         <div class="w-full flex justify-between text-[10px] font-bold opacity-50 mb-10">
-            <span id="top-clock">00:00</span>
-            <span onclick="localStorage.removeItem('capy_api'); location.reload();" class="text-orange-500">API DEĞİŞTİR</span>
+            <span id="top-time">19:10</span>
+            <span onclick="clearApi()" class="text-orange-500 border border-orange-500 px-2 py-1 rounded-lg text-[8px]">API SIFIRLA</span>
         </div>
 
-        <div id="capy-btn" class="mt-20 w-32 h-32 rounded-full glass flex items-center justify-center text-7xl cursor-pointer">🗿</div>
-        <p id="ai-status" class="mt-8 text-center text-orange-400 font-bold px-4 h-24 overflow-y-auto italic">
-            "Kanka 🗿'ya bas, Gemini seni bekliyor."
+        <div id="capy-trigger" class="mt-16 w-32 h-32 rounded-full glass flex items-center justify-center text-7xl cursor-pointer active:scale-95 transition-all">🗿</div>
+        <p id="ai-msg" class="mt-10 text-center text-orange-400 font-bold px-4 h-32 overflow-y-auto italic text-sm leading-relaxed">
+            "Sinyal kulesi hazır kanka. 🗿'ya bas, Gemini ile uçuşa geçelim!"
         </p>
 
         <div class="grid grid-cols-2 gap-10 mt-auto mb-10">
             <div onclick="window.open('https://m.youtube.com')" class="flex flex-col items-center">
-                <div class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-xl">🎬</div>
-                <span class="mt-2 text-[10px] font-bold">YouTube</span>
+                <div class="w-16 h-16 bg-red-600 rounded-3xl flex items-center justify-center text-3xl shadow-2xl">📺</div>
+                <span class="mt-2 text-[10px] font-bold tracking-tighter">YOUTUBE</span>
             </div>
-            <div onclick="location.reload()" class="flex flex-col items-center text-zinc-500">
-                <div class="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center text-3xl border border-zinc-800">🔄</div>
-                <span class="mt-2 text-[10px] font-bold">Reset</span>
+            <div onclick="location.reload()" class="flex flex-col items-center">
+                <div class="w-16 h-16 bg-zinc-800 rounded-3xl flex items-center justify-center text-3xl shadow-2xl">🔄</div>
+                <span class="mt-2 text-[10px] font-bold tracking-tighter">RESET</span>
             </div>
         </div>
     </div>
@@ -51,55 +53,70 @@
     <script type="module">
         import { GoogleGenerativeAI } from "@google/generative-ai";
 
-        // 1. API ANAHTARINI KONTROL ET
-        function checkApi() {
-            const savedKey = localStorage.getItem('capy_api');
-            if (!savedKey) {
-                document.getElementById('api-setup').style.display = 'flex';
-                return null;
+        // Sistem Başlatma Kontrolü
+        window.onload = () => {
+            const key = localStorage.getItem('capy_secret_api');
+            if (key) {
+                document.getElementById('api-gateway').style.display = 'none';
+                document.getElementById('os-interface').style.display = 'flex';
+                runCapyMan(key);
             }
-            return savedKey;
-        }
+        };
 
-        window.saveApiKey = () => {
-            const key = document.getElementById('api-input').value;
-            if (key.length < 10) { alert("Kanka o ne öyle, gerçek anahtarı yaz!"); return; }
-            localStorage.setItem('capy_api', key);
+        // Anahtarı Kaydet
+        window.bootSystem = () => {
+            const input = document.getElementById('api-key-input').value.trim();
+            if (input.length < 20) {
+                alert("Kanka bu anahtar kısa kalmış, resimdekini tam yaz!");
+                return;
+            }
+            localStorage.setItem('capy_secret_api', input);
             location.reload();
         };
 
-        const currentKey = checkApi();
-        
-        if (currentKey) {
-            const genAI = new GoogleGenerativeAI(currentKey);
+        // API Sıfırlama
+        window.clearApi = () => {
+            if(confirm("Anahtarı siliyorum kanka, emin misin?")) {
+                localStorage.removeItem('capy_secret_api');
+                location.reload();
+            }
+        };
 
-            window.askCapy = async () => {
-                const q = prompt("Gemini'ye dökül kanka:");
+        // Gemini Motoru
+        function runCapyMan(key) {
+            const genAI = new GoogleGenerativeAI(key);
+
+            document.getElementById('capy-trigger').onclick = async () => {
+                const q = prompt("CapyMan-Gemini Sorusu:");
                 if(!q) return;
 
-                const st = document.getElementById('ai-status');
-                st.innerText = "Gemini'ye sinyal çakıyorum...";
+                const msg = document.getElementById('ai-msg');
+                const btn = document.getElementById('capy-trigger');
+                
+                msg.innerText = "Gemini'ye telsizden geçiyorum kanka...";
+                btn.classList.add('capy-glow');
 
                 try {
                     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-                    const result = await model.generateContent(`Sen bir Sigma Capybara'sın. Kanka tarzında cevap ver: ${q}`);
-                    const response = await result.response;
-                    const text = response.text();
-
-                    st.innerText = text;
-                    const s = new SpeechSynthesisUtterance(text);
+                    const res = await model.generateContent(`Sen kanka tarzında konuşan bir Sigma Capybara'sın. Soru: ${q}`);
+                    const response = await res.response;
+                    msg.innerText = response.text();
+                    
+                    const s = new SpeechSynthesisUtterance(response.text());
                     s.lang = 'tr-TR'; s.pitch = 0.5; window.speechSynthesis.speak(s);
-                } catch (err) {
-                    st.innerText = "Kanka API'de sıkıntı var. Ya anahtar yanlış ya da yetkisi yok. Sol üstten sıfırla!";
+                } catch (e) {
+                    msg.innerText = "Kanka API'de bir mevzu var. Büyük ihtimal GitHub bunu sildiği için iptal oldu. Yeni bir anahtar alıp sıfırla!";
+                    console.error(e);
+                } finally {
+                    btn.classList.remove('capy-glow');
                 }
             };
-            document.getElementById('capy-btn').onclick = window.askCapy;
         }
 
         // Saat
         setInterval(() => {
             let d = new Date();
-            document.getElementById('top-clock').innerText = d.getHours() + ":" + d.getMinutes().toString().padStart(2, '0');
+            document.getElementById('top-time').innerText = d.getHours().toString().padStart(2, '0') + ":" + d.getMinutes().toString().padStart(2, '0');
         }, 1000);
     </script>
 </body>
