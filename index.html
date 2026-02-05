@@ -5,80 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penaltı - CapyOS</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f2f2f7; margin: 0; display: flex; justify-content: center; }
-        .iphone { width: 100%; max-width: 400px; height: 100vh; background: white; overflow: hidden; position: relative; display: flex; flex-direction: column; }
-        .header { background: #34c759; color: white; padding: 40px 20px 20px; text-align: center; font-size: 24px; font-weight: bold; }
-        .match-list { flex: 1; overflow-y: auto; padding: 15px; }
-        .match-card { background: #f9f9f9; border-radius: 15px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
-        .match-info { flex: 1; }
-        .match-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; display: block; }
-        .match-status { color: #ff3b30; font-size: 13px; font-weight: bold; }
-        .watch-btn { background: #007aff; color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
-        .loading { text-align: center; padding: 20px; color: #666; }
+        :root { --ios-bg: #f2f2f7; --ios-green: #34c759; }
+        body { font-family: -apple-system, sans-serif; background: var(--ios-bg); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .iphone-ui { width: 100%; max-width: 400px; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; min-height: 80vh; }
+        .header { background: var(--ios-green); color: white; padding: 30px 20px; text-align: center; }
+        .header h1 { margin: 0; font-size: 22px; }
+        .header p { margin: 5px 0 0; font-size: 12px; opacity: 0.9; }
+        .match-container { padding: 15px; }
+        .match-card { 
+            background: #fff; border: 1px solid #e5e5ea; border-radius: 15px; 
+            padding: 15px; margin-bottom: 12px; display: flex; 
+            justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+        .match-name { font-weight: 600; font-size: 15px; color: #1c1c1e; }
+        .match-link { 
+            background: #007aff; color: white; text-decoration: none; 
+            padding: 6px 12px; border-radius: 10px; font-size: 12px; 
+        }
+        .status-dot { height: 8px; width: 8px; background: #ff3b30; border-radius: 50%; display: inline-block; margin-right: 5px; animation: blink 1s infinite; }
+        @keyframes blink { 0% {opacity: 1} 50% {opacity: 0.3} 100% {opacity: 1} }
+        #loader { text-align: center; padding: 20px; color: #8e8e93; }
     </style>
 </head>
 <body>
 
-<div class="iphone">
-    <div class="header">PENALTI ⚽</div>
-    <div class="match-list" id="matchList">
-        <div class="loading">Maçlar Google'dan çekiliyor...</div>
+<div class="iphone-ui">
+    <div class="header">
+        <h1>🏆 PENALTI</h1>
+        <p id="date-display"></p>
     </div>
+
+    <div id="loader">Google'a bakılıyor...</div>
+    <div class="match-container" id="matchList"></div>
 </div>
 
 <script>
-    async function fetchMatches() {
-        const container = document.getElementById('matchList');
-        // Google Arama URL'si (Bugünkü maçlar)
-        const targetUrl = 'https://www.google.com/search?q=bugun+oynanan+maclar+canli+skor';
-        
-        // CORS engelini aşmak için ücretsiz bir proxy kullanıyoruz
-        const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl);
+    // Tarihi ayarla
+    document.getElementById('date-display').innerText = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    async function getMatches() {
+        const list = document.getElementById('matchList');
+        const loader = document.getElementById('loader');
+
+        // RSS to JSON servisi kullanarak CORS engelini ve bağlantı hatasını aşıyoruz
+        const feedUrl = "https://news.google.com/rss/search?q=maçı+skoru+canlı+izle&hl=tr&gl=TR&ceid=TR:tr";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
 
         try {
             const response = await fetch(proxyUrl);
             const data = await response.json();
-            const html = data.contents;
-            
-            // Sanal bir belge oluşturup Google'ın HTML'ini içine atıyoruz
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Google'ın spor kartlarını bul (Genelde 'div.K8799c' veya 'div.imso-loa')
-            // Not: Kazıma işlemi tarayıcıda sınırlı olduğu için en temel sonuçları listeleriz
-            const matchCards = doc.querySelectorAll('.K8799c, .V8398c'); 
-            
-            if (matchCards.length === 0) {
-                container.innerHTML = '<div class="loading">Şu an aktif maç bulunamadı veya Google erişimi engelledi.</div>';
-                return;
-            }
 
-            container.innerHTML = ''; // Yükleniyor yazısını kaldır
-            
-            matchCards.forEach(card => {
-                const teams = card.innerText.split('\n').filter(t => t.trim().length > 2);
-                if(teams.length >= 2) {
-                    const matchName = `${teams[0]} vs ${teams[1]}`;
-                    const searchLink = `https://www.google.com/search?q=${teams[0]}+${teams[1]}+canli+izle`;
+            if (data.status === 'ok') {
+                loader.style.display = 'none';
+                data.items.slice(0, 10).forEach(item => {
+                    // Haber başlıklarından takım isimlerini tahmin etmeye çalışıyoruz
+                    const title = item.title.split('-')[0];
                     
-                    container.innerHTML += `
-                        <div class="match-card">
-                            <div class="match-info">
-                                <span class="match-name">${matchName}</span>
-                                <span class="match-status">Canlı Skor İçin Tıkla</span>
-                            </div>
-                            <a href="${searchLink}" target="_blank" class="watch-btn">İzle</a>
+                    const card = document.createElement('div');
+                    card.className = 'match-card';
+                    card.innerHTML = `
+                        <div class="match-info">
+                            <span class="status-dot"></span>
+                            <span class="match-name">${title}</span>
                         </div>
+                        <a href="${item.link}" target="_blank" class="match-link">İzle / Skor</a>
                     `;
-                }
-            });
-        } catch (error) {
-            container.innerHTML = '<div class="loading">Bağlantı hatası! Lütfen tekrar dene.</div>';
+                    list.appendChild(card);
+                });
+            } else {
+                throw new Error();
+            }
+        } catch (e) {
+            loader.innerText = "Maçlar şu an çekilemedi. Lütfen sayfayı yenile kanka.";
         }
     }
 
-    // Sayfa açıldığında maçları getir
-    fetchMatches();
+    getMatches();
 </script>
 
 </body>
