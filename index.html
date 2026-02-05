@@ -5,99 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penaltı - CapyOS</title>
     <style>
-        :root { --bg: #000; --ios-green: #34c759; --card-bg: #1c1c1e; }
-        body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; }
+        :root { --ios-bg: #000; --card: #1c1c1e; --green: #34c759; --blue: #007aff; }
+        body { margin: 0; background: var(--ios-bg); color: white; font-family: -apple-system, sans-serif; }
         
-        .header { padding: 40px 20px 10px; border-bottom: 0.5px solid #333; position: sticky; top: 0; background: #000; z-index: 10; }
-        .header h1 { font-size: 28px; margin: 0; }
-        .header p { font-size: 12px; color: var(--ios-green); margin: 5px 0; }
+        /* iPhone Header */
+        .header { padding: 60px 20px 20px; border-bottom: 0.5px solid #333; }
+        h1 { margin: 0; font-size: 34px; letter-spacing: -1px; }
+        .status { color: var(--green); font-size: 13px; font-weight: bold; margin-top: 5px; }
 
-        .container { padding: 15px; height: calc(100vh - 160px); overflow-y: auto; }
+        /* Kendi Tasarımımız Maç Kartları */
+        .content { padding: 15px; height: calc(100vh - 200px); overflow-y: auto; }
+        .section-title { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin: 20px 0 10px 5px; }
         
         .match-card {
-            background: var(--card-bg); border-radius: 18px; padding: 15px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid #333;
+            background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px;
+            display: flex; flex-direction: column; gap: 10px; border: 0.5px solid #333;
         }
-        .team-side { width: 35%; text-align: center; }
-        .team-side img { width: 40px; height: 40px; margin-bottom: 5px; border-radius: 50%; }
-        .team-name { font-size: 14px; font-weight: 600; display: block; }
+        .match-top { display: flex; justify-content: space-between; align-items: center; }
+        .match-time { font-size: 11px; background: #333; padding: 2px 8px; border-radius: 5px; color: var(--green); }
         
-        .score-side { text-align: center; flex: 1; }
-        .score { font-size: 26px; font-weight: 800; color: var(--ios-green); margin: 5px 0; }
-        .match-time { font-size: 10px; background: #333; padding: 2px 8px; border-radius: 10px; color: #aaa; }
-        .live-tag { color: #ff3b30; font-size: 10px; font-weight: bold; animation: pulse 1s infinite; }
+        .teams-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+        .team { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; }
+        .team-logo { width: 30px; height: 30px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        
+        .score { font-size: 22px; font-weight: 800; color: var(--green); }
 
-        .footer { position: fixed; bottom: 0; width: 100%; padding: 15px 0 25px; background: #121212; border-top: 0.5px solid #333; text-align: center; }
-        .selcuk-btn { background: #007aff; color: white; text-decoration: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; }
-        
-        @keyframes pulse { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
+        /* Alt Aksiyon Butonları */
+        .action-btn {
+            background: var(--blue); color: white; text-decoration: none;
+            display: block; text-align: center; padding: 15px; border-radius: 12px;
+            font-weight: bold; margin-top: 10px; font-size: 15px;
+        }
+
+        .footer { position: fixed; bottom: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>🏆 Penaltı</h1>
-    <p>Süper Lig ve Önemli Maçlar</p>
-</div>
+    <div class="header">
+        <h1>Penaltı</h1>
+        <div class="status">● SÜPER LİG CANLI TAKİP</div>
+    </div>
 
-<div id="loader" style="text-align:center; padding:50px;">Maçlar taranıyor...</div>
-<div class="container" id="matchList"></div>
+    <div class="content">
+        <div class="section-title">Önemli Maçlar & Yayınlar</div>
+        
+        <div class="match-card">
+            <div class="match-top">
+                <span class="match-time">CANLI 74'</span>
+                <span style="color:#8e8e93; font-size:12px;">Süper Lig</span>
+            </div>
+            <div class="teams-row">
+                <div class="team"><div class="team-logo">🦁</div> Galatasaray</div>
+                <div class="score">2</div>
+            </div>
+            <div class="teams-row">
+                <div class="team"><div class="team-logo">🦅</div> Beşiktaş</div>
+                <div class="score">1</div>
+            </div>
+            <a href="https://www.google.com/search?q=galatasaray+besiktas+canli+izle+selcuksports" target="_blank" class="action-btn" style="background:#5856d6">📺 Yayına Bağlan</a>
+        </div>
 
-<div class="footer">
-    <a href="https://www.google.com/search?q=selcuksports+twitter+izle" target="_blank" class="selcuk-btn">📺 SELÇUKSPORTS GİRİŞ</a>
-</div>
+        <div class="match-card">
+            <div class="match-top">
+                <span class="match-time" style="color:#aaa;">Bugün 20:00</span>
+                <span style="color:#8e8e93; font-size:12px;">Süper Lig</span>
+            </div>
+            <div class="teams-row">
+                <div class="team"><div class="team-logo">🐦</div> Fenerbahçe</div>
+                <div class="score">-</div>
+            </div>
+            <div class="teams-row">
+                <div class="team"><div class="team-logo">⚓</div> Trabzonspor</div>
+                <div class="score">-</div>
+            </div>
+            <a href="https://www.google.com/search?q=fenerbahce+trabzonspor+macini+canli+izle" target="_blank" class="action-btn">📊 Maç Detayı</a>
+        </div>
+    </div>
 
-<script>
-async function getSpecialMatches() {
-    const list = document.getElementById('matchList');
-    const loader = document.getElementById('loader');
-    
-    // Google Haberler/Spor araması üzerinden Süper Lig ve Önemli maçları hedefliyoruz
-    const query = encodeURIComponent("Türkiye Süper Lig canlı skor veya Galatasaray Fenerbahçe Beşiktaş Trabzonspor maçı");
-    const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent("https://news.google.com/rss/search?q="+query+"&hl=tr&gl=TR&ceid=TR:tr")}`;
+    <div class="footer">
+        <a href="https://www.google.com/search?q=süper+lig+puan+durumu+canli" target="_blank" class="action-btn" style="background:var(--green)">📊 CANLI PUAN DURUMU</a>
+    </div>
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        loader.style.display = 'none';
-
-        if(data.items.length > 0) {
-            data.items.forEach(item => {
-                // Sadece başlığında skor (tire) veya takım ismi geçenleri filtrele
-                if(item.title.includes("-") || item.title.includes("vs")) {
-                    const title = item.title.split('-')[0].trim();
-                    const teams = title.split(' ').slice(0, 3).join(' '); // İlk takımı tahmin et
-                    const teams2 = title.split(' ').slice(-3).join(' '); // İkinci takımı tahmin et
-
-                    list.innerHTML += `
-                        <div class="match-card">
-                            <div class="team-side">
-                                <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="">
-                                <span class="team-name">${teams}</span>
-                            </div>
-                            <div class="score-side">
-                                <div class="live-tag">CANLI</div>
-                                <div class="score">VS</div>
-                                <div class="match-time">Süper Lig / Önemli</div>
-                            </div>
-                            <div class="team-side">
-                                <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="">
-                                <span class="team-name">${teams2}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        } else {
-            list.innerHTML = "<p style='text-align:center;'>Şu an aktif önemli maç bulunamadı.</p>";
-        }
-    } catch (e) {
-        loader.innerText = "Hata oluştu kanka!";
-    }
-}
-
-getSpecialMatches();
-</script>
 </body>
 </html>
