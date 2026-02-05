@@ -5,95 +5,226 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penaltı - CapyOS</title>
     <style>
-        :root { --ios-blue: #007aff; --ios-bg: #f2f2f7; }
-        body { font-family: -apple-system, sans-serif; background: var(--ios-bg); margin: 0; padding-bottom: 70px; }
+        :root { 
+            --ios-blue: #007aff; 
+            --ios-bg: #f2f2f7; 
+            --ios-card-bg: white;
+            --ios-dark-text: #1c1c1e;
+            --ios-light-text: #8e8e93;
+            --ios-separator: #d1d1d6;
+        }
+        body { 
+            font-family: -apple-system, sans-serif; 
+            background: var(--ios-bg); 
+            margin: 0; 
+            padding-bottom: 70px; 
+            -webkit-font-smoothing: antialiased;
+        }
         
         /* Üst Başlık */
-        .header { background: white; padding: 50px 20px 15px; border-bottom: 0.5px solid #d1d1d6; position: sticky; top: 0; z-index: 100; }
-        .header h1 { margin: 0; font-size: 32px; letter-spacing: -1px; }
+        .header { 
+            background: var(--ios-card-bg); 
+            padding: 50px 20px 15px; 
+            border-bottom: 0.5px solid var(--ios-separator); 
+            position: sticky; top: 0; z-index: 100; 
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05); /* Hafif gölge */
+        }
+        .header h1 { margin: 0; font-size: 32px; letter-spacing: -1px; color: var(--ios-dark-text); }
+        .header .subtitle { font-size: 14px; color: var(--ios-light-text); margin-top: 5px; }
 
         /* İçerik Alanları */
         .page { display: none; padding: 15px; }
         .active-page { display: block; }
 
-        /* Kart Tasarımı */
-        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .match-title { font-weight: 600; font-size: 16px; }
-        .btn-mini { background: var(--ios-blue); color: white; text-decoration: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; }
+        /* Maç Kartları */
+        .match-card { 
+            background: var(--ios-card-bg); 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            flex-direction: column; /* Görsel odaklı */
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Daha belirgin gölge */
+            transition: transform 0.2s ease-out;
+            text-decoration: none;
+            color: var(--ios-dark-text);
+        }
+        .match-card:active { transform: scale(0.98); }
 
-        /* Puan Durumu iframe (Google'dan Direkt) */
-        .puan-tablo { width: 100%; height: 600px; border: none; border-radius: 12px; }
+        .team-logos { display: flex; align-items: center; margin-bottom: 10px; width: 100%; justify-content: space-around; }
+        .team { text-align: center; flex: 1; }
+        .team-name { font-weight: 600; font-size: 16px; margin-top: 5px; }
+        .score { font-size: 28px; font-weight: bold; color: var(--ios-blue); margin: 0 10px; }
+        .logo { width: 50px; height: 50px; object-fit: contain; }
 
-        /* Alt Tab Bar (iPhone Stili) */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0 25px; border-top: 0.5px solid #d1d1d6; }
-        .tab-item { border: none; background: none; color: #8e8e93; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 10px; }
+        .match-status { 
+            background: #ff3b30; color: white; padding: 4px 10px; 
+            border-radius: 8px; font-size: 12px; font-weight: bold; margin-bottom: 10px; 
+            animation: pulse 1.5s infinite; /* Canlı vurgusu */
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .watch-btn { 
+            background: var(--ios-blue); color: white; text-decoration: none; 
+            padding: 10px 20px; border-radius: 10px; font-size: 15px; font-weight: 600;
+            width: calc(100% - 30px); text-align: center; margin-top: 10px;
+        }
+
+        /* Puan Durumu iframe */
+        .puan-tablo { width: 100%; height: 600px; border: none; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+        /* Alt Tab Bar */
+        .tab-bar { 
+            position: fixed; bottom: 0; width: 100%; 
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); 
+            display: flex; justify-content: space-around; 
+            padding: 10px 0 25px; 
+            border-top: 0.5px solid var(--ios-separator);
+            box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+        }
+        .tab-item { 
+            border: none; background: none; color: var(--ios-light-text); 
+            cursor: pointer; display: flex; flex-direction: column; 
+            align-items: center; font-size: 10px; 
+            transition: color 0.2s ease-out;
+        }
         .tab-item.active { color: var(--ios-blue); }
         .tab-icon { font-size: 20px; margin-bottom: 3px; }
+        #loader { text-align: center; padding: 20px; color: var(--ios-light-text); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1 id="page-title">Maçlar</h1>
+    <h1 id="page-title">Canlı Maçlar</h1>
+    <div class="subtitle">CapyOS Penaltı</div>
 </div>
 
-<div id="maclar" class="page active-page">
-    <div id="loader" style="text-align:center; padding:20px;">Google'dan maçlar taranıyor...</div>
-    <div id="matchList"></div>
+<div id="canli-maclar" class="page active-page">
+    <div id="loader" style="text-align:center; padding:20px;">Canlı maçlar Google'dan çekiliyor...</div>
+    <div id="matchList">
+        </div>
 </div>
 
-<div id="puan" class="page">
-    <div class="card" style="display:block; text-align:center;">
-        <p>Süper Lig Güncel Puan Durumu</p>
-        <a href="https://www.google.com/search?q=super+lig+puan+durumu" target="_blank" class="btn-mini">Tam Ekran Gör</a>
+<div id="puan-durumu" class="page">
+    <div style="padding: 15px;">
+        <p style="font-size: 14px; color: var(--ios-light-text);">Süper Lig Güncel Puan Durumu</p>
+        <a href="https://www.google.com/search?q=süper+lig+puan+durumu" target="_blank" class="watch-btn" style="background:#34c759; margin-bottom:15px;">Google'dan Tam Ekran Gör</a>
+        <iframe class="puan-tablo" src="https://www.bing.com/search?q=süper+lig+puan+durumu"></iframe>
     </div>
-    <iframe class="puan-tablo" src="https://www.bing.com/search?q=süper+lig+puan+durumu"></iframe>
 </div>
 
 <nav class="tab-bar">
-    <button class="tab-item active" onclick="showPage('maclar', 'Maçlar', this)">
+    <button class="tab-item active" onclick="showPage('canli-maclar', 'Canlı Maçlar', this)">
         <span class="tab-icon">⚽</span>
         <span>Maçlar</span>
     </button>
-    <button class="tab-item" onclick="showPage('puan', 'Puan Durumu', this)">
+    <button class="tab-item" onclick="showPage('puan-durumu', 'Puan Durumu', this)">
         <span class="tab-icon">📊</span>
-        <span>Puan Durumu</span>
+        <span>Puan</span>
     </button>
 </nav>
 
 <script>
     function showPage(pageId, title, btn) {
-        // Sayfa değiştir
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(pageId).classList.add('active-page');
         document.getElementById('page-title').innerText = title;
-        
-        // Tab ikon rengini değiştir
         document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Google Haberler üzerinden maç çekme motoru
+    // Maçlar için görsel çekme ve gösterme fonksiyonu
     async function fetchLiveMatches() {
         const list = document.getElementById('matchList');
         const loader = document.getElementById('loader');
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent("https://news.google.com/rss/search?q=maçı+skoru+canlı+izle&hl=tr&gl=TR&ceid=TR:tr")}`;
+        
+        // Google Haberler RSS'i kullanıyoruz, böylece "canlı" kelimesi içeren manşetleri çekeriz
+        const feedUrl = "https://news.google.com/rss/search?q=canlı+maç+skoru+izle&hl=tr&gl=TR&ceid=TR:tr";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
 
         try {
             const res = await fetch(proxyUrl);
             const data = await res.json();
             loader.style.display = 'none';
             
-            data.items.slice(0, 8).forEach(item => {
-                const cleanTitle = item.title.split('-')[0].trim();
-                list.innerHTML += `
-                    <div class="card">
-                        <span class="match-title">${cleanTitle}</span>
-                        <a href="${item.link}" target="_blank" class="btn-mini">İzle</a>
-                    </div>`;
-            });
+            if (data.status === 'ok' && data.items.length > 0) {
+                // İlk 5-7 maçı listele
+                data.items.slice(0, 7).forEach(item => {
+                    const title = item.title.split(' - ')[0].trim(); // Başlıktan takım isimlerini ayıkla
+                    // Takım isimlerini ve skorları tahmin etmeye çalış
+                    let team1 = "Takım 1";
+                    let team2 = "Takım 2";
+                    let score = "CANLI";
+                    let matchTime = ""; // Henüz tahmin edemiyoruz, varsayılan
+
+                    // Basit bir regex ile takım ve skor tahmini
+                    const scoreMatch = title.match(/(\d+)\s*-\s*(\d+)/);
+                    if (scoreMatch) {
+                        score = `${scoreMatch[1]} - ${scoreMatch[2]}`;
+                        const teams = title.replace(scoreMatch[0], '').split('vs').map(s => s.trim()).filter(Boolean);
+                        if (teams.length >= 2) {
+                            team1 = teams[0];
+                            team2 = teams[1];
+                        } else { // Eğer vs yoksa ve skor varsa, başlığı takım olarak kullan
+                            const parts = title.split(' ');
+                            if(parts.length > 2) {
+                                team1 = parts[0];
+                                team2 = parts[parts.length - 1];
+                            }
+                        }
+                    } else { // Skor yoksa, sadece takım isimlerini tahmin etmeye çalış
+                        const teams = title.split(' vs ').map(s => s.trim()).filter(Boolean);
+                        if (teams.length >= 2) {
+                            team1 = teams[0];
+                            team2 = teams[1];
+                        } else { // Çok genel bir başlık ise ilk kelimeleri al
+                            const parts = title.split(' ');
+                            if (parts.length > 1) {
+                                team1 = parts[0];
+                                team2 = parts[1];
+                            }
+                        }
+                        score = "Canlı Skor"; // Eğer skor çekilemezse varsayılan
+                    }
+
+                    // Basit logo URL'leri (gerçek logolar için API gerekir, bu sadece örnek)
+                    const getLogoUrl = (teamName) => {
+                        const baseUrl = "https://www.google.com/s2/favicons?domain=";
+                        if (teamName.includes("Galatasaray")) return baseUrl + "galatasaray.org";
+                        if (teamName.includes("Fenerbahçe")) return baseUrl + "fenerbahce.org";
+                        if (teamName.includes("Beşiktaş")) return baseUrl + "bjk.com.tr";
+                        if (teamName.includes("Trabzonspor")) return baseUrl + "trabzonspor.org.tr";
+                        return "https://via.placeholder.com/50/eeeeee/aaaaaa?text=⚽"; // Varsayılan logo
+                    };
+
+                    const selcukLink = `https://www.google.com/search?q=${team1}+${team2}+maçı+selcuksports+izle`;
+
+                    list.innerHTML += `
+                        <a href="${selcukLink}" target="_blank" class="match-card">
+                            <div class="match-status">${score} ${matchTime}</div>
+                            <div class="team-logos">
+                                <div class="team">
+                                    <img src="${getLogoUrl(team1)}" alt="${team1}" class="logo">
+                                    <span class="team-name">${team1}</span>
+                                </div>
+                                <span class="score">-</span>
+                                <div class="team">
+                                    <img src="${getLogoUrl(team2)}" alt="${team2}" class="logo">
+                                    <span class="team-name">${team2}</span>
+                                </div>
+                            </div>
+                            <span class="watch-btn">Maçı Selçuksports'tan İzle</span>
+                        </a>
+                    `;
+                });
+            } else {
+                list.innerHTML = `<p style="text-align:center; color:var(--ios-light-text);">Şu an canlı maç bulunamadı kanka. <br>Birazdan tekrar dene!</p>`;
+            }
         } catch (e) {
-            loader.innerText = "Şu an bağlantı kurulamadı kanka.";
+            loader.innerText = "Maçları çekerken bir sorun oluştu kanka. Sayfayı yenilemeyi dene.";
+            console.error(e);
         }
     }
 
