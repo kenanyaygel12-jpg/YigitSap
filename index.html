@@ -2,74 +2,102 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penaltı - CapyOS</title>
     <style>
-        :root { --ios-bg: #000; --ios-blue: #007aff; --ios-green: #34c759; }
-        body { margin: 0; padding: 0; background: var(--ios-bg); color: white; font-family: -apple-system, sans-serif; overflow: hidden; }
-
-        /* AÇILIŞ EKRANI */
-        #splash {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .start-btn {
-            background: var(--ios-green); border: none; color: white; padding: 15px 40px;
-            border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 20px rgba(52, 199, 89, 0.4);
-        }
-
-        /* HEADER */
-        .header { padding: 45px 20px 10px; background: #121212; border-bottom: 0.5px solid #333; text-align: left; }
-        .header h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
-        .header span { color: var(--ios-green); font-size: 12px; font-weight: bold; }
-
-        /* İÇERİK */
-        .content { height: calc(100vh - 145px); overflow-y: auto; background: #fff; }
+        :root { --bg: #000; --ios-green: #34c759; --card-bg: #1c1c1e; }
+        body { margin: 0; background: var(--bg); color: white; font-family: -apple-system, sans-serif; }
         
-        /* ALT BAR */
-        .footer {
-            position: fixed; bottom: 0; width: 100%; height: 75px;
-            background: #121212; border-top: 0.5px solid #333;
-            display: flex; align-items: center; justify-content: center; z-index: 100;
+        .header { padding: 40px 20px 10px; border-bottom: 0.5px solid #333; position: sticky; top: 0; background: #000; z-index: 10; }
+        .header h1 { font-size: 28px; margin: 0; }
+        .header p { font-size: 12px; color: var(--ios-green); margin: 5px 0; }
+
+        .container { padding: 15px; height: calc(100vh - 160px); overflow-y: auto; }
+        
+        .match-card {
+            background: var(--card-bg); border-radius: 18px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #333;
         }
-        .selcuk-btn {
-            width: 85%; background: var(--ios-blue); color: white; text-decoration: none;
-            padding: 12px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 16px;
-        }
+        .team-side { width: 35%; text-align: center; }
+        .team-side img { width: 40px; height: 40px; margin-bottom: 5px; border-radius: 50%; }
+        .team-name { font-size: 14px; font-weight: 600; display: block; }
+        
+        .score-side { text-align: center; flex: 1; }
+        .score { font-size: 26px; font-weight: 800; color: var(--ios-green); margin: 5px 0; }
+        .match-time { font-size: 10px; background: #333; padding: 2px 8px; border-radius: 10px; color: #aaa; }
+        .live-tag { color: #ff3b30; font-size: 10px; font-weight: bold; animation: pulse 1s infinite; }
+
+        .footer { position: fixed; bottom: 0; width: 100%; padding: 15px 0 25px; background: #121212; border-top: 0.5px solid #333; text-align: center; }
+        .selcuk-btn { background: #007aff; color: white; text-decoration: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; }
+        
+        @keyframes pulse { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <h1 style="margin-bottom: 20px;">⚽ PENALTI</h1>
-        <button class="start-btn" onclick="initApp()">SESLERİ AÇ VE BAŞLA</button>
-        <p style="color: #444; font-size: 12px; margin-top: 15px;">Canlı skorlar ve anlık veriler yükleniyor...</p>
-    </div>
+<div class="header">
+    <h1>🏆 Penaltı</h1>
+    <p>Süper Lig ve Önemli Maçlar</p>
+</div>
 
-    <div class="header">
-        <h1>Canlı Skorlar</h1>
-        <span>● ANLIK VERİ AKIŞI AKTİF</span>
-    </div>
+<div id="loader" style="text-align:center; padding:50px;">Maçlar taranıyor...</div>
+<div class="container" id="matchList"></div>
 
-    <div class="content">
-        <iframe src="https://m.flashscore.com.tr/" 
-                style="width: 100%; height: 100%; border: none;" 
-                id="scoreFrame"></iframe>
-    </div>
+<div class="footer">
+    <a href="https://www.google.com/search?q=selcuksports+twitter+izle" target="_blank" class="selcuk-btn">📺 SELÇUKSPORTS GİRİŞ</a>
+</div>
 
-    <div class="footer">
-        <a href="https://www.google.com/search?q=selcuksports+izle+twitter+güncel" target="_blank" class="selcuk-btn">
-            📺 SELÇUKSPORTS YAYINLARI
-        </a>
-    </div>
+<script>
+async function getSpecialMatches() {
+    const list = document.getElementById('matchList');
+    const loader = document.getElementById('loader');
+    
+    // Google Haberler/Spor araması üzerinden Süper Lig ve Önemli maçları hedefliyoruz
+    const query = encodeURIComponent("Türkiye Süper Lig canlı skor veya Galatasaray Fenerbahçe Beşiktaş Trabzonspor maçı");
+    const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent("https://news.google.com/rss/search?q="+query+"&hl=tr&gl=TR&ceid=TR:tr")}`;
 
-    <script>
-        function initApp() {
-            document.getElementById('splash').style.display = 'none';
-            // Gol sesi simülasyonu için kullanıcı etkileşimi alındı
-            console.log("Uygulama başlatıldı, veriler çekiliyor...");
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        loader.style.display = 'none';
+
+        if(data.items.length > 0) {
+            data.items.forEach(item => {
+                // Sadece başlığında skor (tire) veya takım ismi geçenleri filtrele
+                if(item.title.includes("-") || item.title.includes("vs")) {
+                    const title = item.title.split('-')[0].trim();
+                    const teams = title.split(' ').slice(0, 3).join(' '); // İlk takımı tahmin et
+                    const teams2 = title.split(' ').slice(-3).join(' '); // İkinci takımı tahmin et
+
+                    list.innerHTML += `
+                        <div class="match-card">
+                            <div class="team-side">
+                                <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="">
+                                <span class="team-name">${teams}</span>
+                            </div>
+                            <div class="score-side">
+                                <div class="live-tag">CANLI</div>
+                                <div class="score">VS</div>
+                                <div class="match-time">Süper Lig / Önemli</div>
+                            </div>
+                            <div class="team-side">
+                                <img src="https://www.google.com/s2/favicons?domain=google.com&sz=64" alt="">
+                                <span class="team-name">${teams2}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        } else {
+            list.innerHTML = "<p style='text-align:center;'>Şu an aktif önemli maç bulunamadı.</p>";
         }
-    </script>
+    } catch (e) {
+        loader.innerText = "Hata oluştu kanka!";
+    }
+}
+
+getSpecialMatches();
+</script>
 </body>
 </html>
