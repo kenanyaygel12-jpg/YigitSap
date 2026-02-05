@@ -2,89 +2,53 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penaltı - CapyOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Penaltı</title>
     <style>
-        :root { --ios-bg: #000; --card: #1c1c1e; --green: #34c759; --blue: #007aff; }
-        body { margin: 0; background: var(--ios-bg); color: white; font-family: -apple-system, sans-serif; }
-        
-        /* iPhone Header */
-        .header { padding: 60px 20px 20px; border-bottom: 0.5px solid #333; }
-        h1 { margin: 0; font-size: 34px; letter-spacing: -1px; }
-        .status { color: var(--green); font-size: 13px; font-weight: bold; margin-top: 5px; }
+        :root { --ios-bg: #000; --ios-blue: #007aff; }
+        body { margin: 0; padding: 0; background: var(--ios-bg); font-family: -apple-system, sans-serif; overflow: hidden; }
 
-        /* Kendi Tasarımımız Maç Kartları */
-        .content { padding: 15px; height: calc(100vh - 200px); overflow-y: auto; }
-        .section-title { font-size: 13px; color: #8e8e93; text-transform: uppercase; margin: 20px 0 10px 5px; }
-        
-        .match-card {
-            background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px;
-            display: flex; flex-direction: column; gap: 10px; border: 0.5px solid #333;
+        /* CapyOS iPhone Üst Bar */
+        .header {
+            padding: 50px 20px 15px; background: #121212;
+            border-bottom: 0.5px solid #333; position: sticky; top: 0; z-index: 100;
         }
-        .match-top { display: flex; justify-content: space-between; align-items: center; }
-        .match-time { font-size: 11px; background: #333; padding: 2px 8px; border-radius: 5px; color: var(--green); }
-        
-        .teams-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
-        .team { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; }
-        .team-logo { width: 30px; height: 30px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        
-        .score { font-size: 22px; font-weight: 800; color: var(--green); }
+        .header h1 { margin: 0; font-size: 28px; color: white; letter-spacing: -1px; }
+        .header span { color: #34c759; font-size: 12px; font-weight: bold; }
 
-        /* Alt Aksiyon Butonları */
-        .action-btn {
-            background: var(--blue); color: white; text-decoration: none;
-            display: block; text-align: center; padding: 15px; border-radius: 12px;
-            font-weight: bold; margin-top: 10px; font-size: 15px;
+        /* MAÇ ALANI (Haber Değil, Gerçek Skor) */
+        .match-frame {
+            width: 100%; height: calc(100vh - 145px); border: none;
+            background: #fff; /* Widget genelde beyaz olur */
         }
 
-        .footer { position: fixed; bottom: 0; width: 100%; padding: 20px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        /* ALT AKSİYON BAR */
+        .footer {
+            position: fixed; bottom: 0; width: 100%; height: 75px;
+            background: #121212; border-top: 0.5px solid #333;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .selcuk-btn {
+            width: 85%; background: var(--ios-blue); color: white; text-decoration: none;
+            padding: 12px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>Penaltı</h1>
-        <div class="status">● SÜPER LİG CANLI TAKİP</div>
+        <span>● CANLI SKORLAR (GERÇEK ZAMANLI)</span>
     </div>
 
-    <div class="content">
-        <div class="section-title">Önemli Maçlar & Yayınlar</div>
-        
-        <div class="match-card">
-            <div class="match-top">
-                <span class="match-time">CANLI 74'</span>
-                <span style="color:#8e8e93; font-size:12px;">Süper Lig</span>
-            </div>
-            <div class="teams-row">
-                <div class="team"><div class="team-logo">🦁</div> Galatasaray</div>
-                <div class="score">2</div>
-            </div>
-            <div class="teams-row">
-                <div class="team"><div class="team-logo">🦅</div> Beşiktaş</div>
-                <div class="score">1</div>
-            </div>
-            <a href="https://www.google.com/search?q=galatasaray+besiktas+canli+izle+selcuksports" target="_blank" class="action-btn" style="background:#5856d6">📺 Yayına Bağlan</a>
-        </div>
-
-        <div class="match-card">
-            <div class="match-top">
-                <span class="match-time" style="color:#aaa;">Bugün 20:00</span>
-                <span style="color:#8e8e93; font-size:12px;">Süper Lig</span>
-            </div>
-            <div class="teams-row">
-                <div class="team"><div class="team-logo">🐦</div> Fenerbahçe</div>
-                <div class="score">-</div>
-            </div>
-            <div class="teams-row">
-                <div class="team"><div class="team-logo">⚓</div> Trabzonspor</div>
-                <div class="score">-</div>
-            </div>
-            <a href="https://www.google.com/search?q=fenerbahce+trabzonspor+macini+canli+izle" target="_blank" class="action-btn">📊 Maç Detayı</a>
-        </div>
-    </div>
+    <iframe class="match-frame" 
+            src="https://m.canliskor.biz.tr/" 
+            id="scoreWidget"></iframe>
 
     <div class="footer">
-        <a href="https://www.google.com/search?q=süper+lig+puan+durumu+canli" target="_blank" class="action-btn" style="background:var(--green)">📊 CANLI PUAN DURUMU</a>
+        <a href="https://www.google.com/search?q=selcuksports+izle+twitter+güncel" target="_blank" class="selcuk-btn">
+            📺 SELÇUKSPORTS GİRİŞ
+        </a>
     </div>
 
 </body>
