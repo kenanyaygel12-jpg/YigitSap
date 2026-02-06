@@ -2,55 +2,40 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>CapyHub - Çocuk Özel</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f8ff; text-align: center; }
-        .container { max-width: 400px; margin: auto; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        button { background: #ff9f43; border: none; padding: 10px 20px; border-radius: 10px; color: white; cursor: pointer; }
-        .calc-screen { width: 100%; height: 50px; background: #eee; margin-bottom: 10px; text-align: right; font-size: 24px; padding: 10px; box-sizing: border-box; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>CapyHub Pro</title>
 </head>
 <body>
-    <div class="container">
-        <h2>🐾 CapyHub</h2>
-        
-        <div class="calc-screen" id="screen">0</div>
-        <button onclick="calculate('7')">7</button>
-        <button onclick="calculate('8')">8</button>
-        <button onclick="calculate('9')">9</button>
-        <button onclick="calculate('*')">×</button>
-        <br><br>
+    <div id="status-bar">12:45 🐾</div>
+    
+    <div class="app-container" id="app">
+        <nav class="tabs">
+            <button onclick="showApp('calc')">🔢 Hesap</button>
+            <button onclick="showApp('calen')">📅 Takvim</button>
+            <button onclick="showApp('alarm')">⏰ Alarm</button>
+        </nav>
 
-        <input type="time" id="alarmTime">
-        <button onclick="setAlarm()">Alarmı Kur</button>
+        <div id="calc-app" class="sub-app">
+            <div id="calc-display">0</div>
+            <div id="calc-history"></div>
+            </div>
+
+        <div id="alarm-app" class="sub-app" style="display:none;">
+            <h3>Alarm Kur</h3>
+            <input type="time" id="alarmTime">
+            <button id="setAlarmBtn">Kur</button>
+        </div>
     </div>
 
-    <script>
-        // Service Worker Kaydı (Arka planda çalışma için şart)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(() => {
-                console.log("CapyOS Altyapısı Hazır!");
-            });
-        }
+    <div class="physical-buttons">
+        <button onclick="adjustBrightness('up')">☀️ +</button>
+        <button onclick="adjustBrightness('down')">🔅 -</button>
+    </div>
 
-        function setAlarm() {
-            const time = document.getElementById('alarmTime').value;
-            if (!time) return alert("Zaman seç!");
-            
-            // Bildirim izni iste
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    localStorage.setItem('targetAlarm', time);
-                    alert("Alarm kuruldu! Sayfayı kapatsan da çalışacak.");
-                }
-            });
-        }
-
-        function calculate(val) {
-            let s = document.getElementById('screen');
-            if(s.innerText === "0") s.innerText = val;
-            else s.innerText += val;
-        }
-    </script>
+    <script src="storage.js"></script>
+    <script src="calculator.js"></script>
+    <script src="alarm.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
