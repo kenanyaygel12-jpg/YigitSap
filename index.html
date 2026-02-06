@@ -2,40 +2,107 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>CapyHub Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CapyOS Pro - Ultimate Edition</title>
+    <link rel="stylesheet" href="capy-core.css">
+    <style>
+        /* Hızlı UI Yamaları */
+        .home-indicator {
+            width: 140px; height: 5px; background: white;
+            position: absolute; bottom: 8px; left: 50%;
+            transform: translateX(-50%); border-radius: 10px;
+        }
+        #calc-screen {
+            background: #222; color: #0f0; padding: 20px;
+            font-family: 'Courier New', monospace; font-size: 2rem;
+            text-align: right; border-radius: 15px; margin-bottom: 10px;
+        }
+    </style>
 </head>
-<body>
-    <div id="status-bar">12:45 🐾</div>
-    
-    <div class="app-container" id="app">
-        <nav class="tabs">
-            <button onclick="showApp('calc')">🔢 Hesap</button>
-            <button onclick="showApp('calen')">📅 Takvim</button>
-            <button onclick="showApp('alarm')">⏰ Alarm</button>
-        </nav>
+<body id="os-root">
 
-        <div id="calc-app" class="sub-app">
-            <div id="calc-display">0</div>
-            <div id="calc-history"></div>
+    <div id="status-bar">
+        <span id="os-time">21:46</span>
+        <div class="status-right">📶 🔋</div>
+    </div>
+
+    <section id="home-screen">
+        <div class="app-grid">
+            <div class="app-icon" onclick="Kernel.openApp('calculator')">
+                <div class="icon-shape calc-gradient">🧮</div>
+                <span>Hesapla</span>
+            </div>
+            <div class="app-icon" onclick="Kernel.openApp('alarm')">
+                <div class="icon-shape alarm-gradient">⏰</div>
+                <span>Alarm</span>
+            </div>
+            <div class="app-icon" onclick="Kernel.openApp('calendar')">
+                <div class="icon-shape cal-gradient">🗓️</div>
+                <span>Takvim</span>
+            </div>
+            <div class="app-icon" onclick="Kernel.openApp('logs')">
+                <div class="icon-shape log-gradient">📂</div>
+                <span>Sistem Kayıtları</span>
+            </div>
+        </div>
+    </section>
+
+    <div id="app-layer" class="app-window">
+        <div class="swipe-handle" id="global-drag-bar"></div>
+        
+        <div class="app-content-wrapper">
+            <h2 id="app-title">Uygulama</h2>
+            <hr>
+            
+            <div id="calc-interface" class="app-inner" style="display:none;">
+                <div id="calc-screen">0</div>
+                <div class="calc-buttons">
+                    <button onclick="CalcEngine.press('7')">7</button>
+                    <button onclick="CalcEngine.press('8')">8</button>
+                    <button onclick="CalcEngine.press('9')">9</button>
+                    <button onclick="CalcEngine.solve()" style="background:var(--capy-gold)">=</button>
+                    <button onclick="CalcEngine.clear()" style="background:#ff4444">C</button>
+                </div>
             </div>
 
-        <div id="alarm-app" class="sub-app" style="display:none;">
-            <h3>Alarm Kur</h3>
-            <input type="time" id="alarmTime">
-            <button id="setAlarmBtn">Kur</button>
+            <div id="alarm-interface" class="app-inner" style="display:none;">
+                <input type="time" id="alarm-input">
+                <button onclick="AlarmService.setNewAlarm(document.getElementById('alarm-input').value, 'Çalışma Vakti!')">Alarmı Kur</button>
+            </div>
+
+            <div id="log-interface" class="app-inner" style="display:none;">
+                <div id="log-list" style="color: #ccc; text-align: left; font-size: 0.8rem;"></div>
+            </div>
         </div>
+        
+        <div class="home-indicator"></div>
     </div>
 
-    <div class="physical-buttons">
-        <button onclick="adjustBrightness('up')">☀️ +</button>
-        <button onclick="adjustBrightness('down')">🔅 -</button>
+    <div class="side-hardware">
+        <button onclick="Hardware.brightUp()">☀️</button>
+        <div class="spacer"></div>
+        <button onclick="Hardware.brightDown()">🌑</button>
     </div>
 
-    <script src="storage.js"></script>
-    <script src="calculator.js"></script>
-    <script src="alarm.js"></script>
-    <script src="main.js"></script>
+    <script src="db-manager.js"></script>
+    <script src="hardware-driver.js"></script>
+    <script src="calc-engine.js"></script>
+    <script src="alarm-service.js"></script>
+    <script src="os-kernel.js"></script>
+
+    <script>
+        // Saat Güncelleme Motoru
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('os-time').innerText = now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+
+        // Kayıtları Görüntüleme Fonksiyonu (Özel)
+        function refreshLogs() {
+            const list = document.getElementById('log-list');
+            const data = CapyDB.readAll();
+            list.innerHTML = data.map(log => `<div>[${log.date}] ${log.type}: ${log.data}</div>`).join('');
+        }
+    </script>
 </body>
 </html>
