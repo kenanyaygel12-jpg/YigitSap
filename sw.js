@@ -1,16 +1,10 @@
-// Arka plan kontrolü
-self.addEventListener('install', (event) => {
-    self.skipWaiting();
+self.addEventListener('push', function(event) {
+    const options = {
+        body: 'CapyOS: Ödev Vakti Geldi! 🐾',
+        icon: 'capy-icon.png',
+        vibrate: [200, 100, 200]
+    };
+    event.waitUntil(
+        self.registration.showNotification('ALARM ÇALIYOR!', options)
+    );
 });
-
-// Her 30 saniyede bir saati kontrol eden bir döngü simülasyonu
-setInterval(() => {
-    // Not: Gerçek dünyada 'Push API' daha verimlidir ancak 
-    // bu mantık basit cihazlar için temel oluşturur.
-    console.log("CapyOS Arka Planda Zamanı Kontrol Ediyor...");
-}, 30000);
-
-self.onnotificationclick = function(event) {
-    event.notification.close();
-    clients.openWindow('/'); // Bildirime tıklayınca uygulamayı aç
-};
